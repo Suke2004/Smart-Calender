@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Book, Target } from 'lucide-react';
+import { X, Book, Target, CalendarDays } from 'lucide-react';
 import { Subject } from '../../../types';
 import { cn } from '../../../utils';
 
@@ -19,6 +19,17 @@ export function SubjectModal({ isOpen, onClose, editingSubject, onSave, themeCol
   const [code, setCode] = useState('');
   const [targetAttendance, setTargetAttendance] = useState(75);
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
+  const [schedule, setSchedule] = useState<number[]>([1, 2, 3, 4, 5]); // Default Mon-Fri
+
+  const DAYS = [
+    { label: 'S', value: 0 },
+    { label: 'M', value: 1 },
+    { label: 'T', value: 2 },
+    { label: 'W', value: 3 },
+    { label: 'T', value: 4 },
+    { label: 'F', value: 5 },
+    { label: 'S', value: 6 },
+  ];
 
   useEffect(() => {
     if (editingSubject) {
@@ -26,11 +37,13 @@ export function SubjectModal({ isOpen, onClose, editingSubject, onSave, themeCol
       setCode(editingSubject.code);
       setTargetAttendance(editingSubject.targetAttendance);
       setSelectedColor(editingSubject.themeColor);
+      setSchedule(editingSubject.schedule || [1, 2, 3, 4, 5]);
     } else {
       setName('');
       setCode('');
       setTargetAttendance(75);
       setSelectedColor(PRESET_COLORS[0]);
+      setSchedule([1, 2, 3, 4, 5]);
     }
   }, [editingSubject, isOpen]);
 
@@ -42,6 +55,7 @@ export function SubjectModal({ isOpen, onClose, editingSubject, onSave, themeCol
       code,
       targetAttendance,
       themeColor: selectedColor,
+      schedule,
       records: editingSubject ? editingSubject.records : {},
     };
     onSave(subject);
@@ -127,6 +141,39 @@ export function SubjectModal({ isOpen, onClose, editingSubject, onSave, themeCol
                   className="w-full accent-primary"
                   style={{ accentColor: themeColor } as any}
                 />
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarDays size={14} style={{ color: themeColor }} />
+                  <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
+                    Timetable (Scheduled Days)
+                  </span>
+                </div>
+                <div className="flex justify-between gap-1">
+                  {DAYS.map((day) => {
+                    const isSelected = schedule.includes(day.value);
+                    return (
+                      <button
+                        key={day.value}
+                        onClick={() => {
+                          setSchedule((prev) => 
+                            isSelected ? prev.filter(d => d !== day.value) : [...prev, day.value]
+                          );
+                        }}
+                        className={cn(
+                          "w-8 h-8 rounded-full text-xs font-bold transition-all",
+                          isSelected 
+                            ? "text-surface shadow-md" 
+                            : "bg-outline/5 text-on-surface-variant hover:bg-outline/10"
+                        )}
+                        style={isSelected ? { backgroundColor: themeColor } : {}}
+                      >
+                        {day.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>

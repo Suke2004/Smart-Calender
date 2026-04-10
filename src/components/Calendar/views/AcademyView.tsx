@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Check, X, Minus, Trash2, Edit2, TrendingUp, ShieldAlert, Zap } from 'lucide-react';
+import { Plus, Check, X, Minus, Trash2, Edit2, TrendingUp, ShieldAlert, Zap, Calendar as CalendarIcon, Activity } from 'lucide-react';
 import { useAcademy, SubjectStats } from '../../../hooks/useAcademy';
 import { format } from 'date-fns';
 import { Subject } from '../../../types';
@@ -13,6 +13,18 @@ interface AcademyViewProps {
 
 export function AcademyView({ themeColor, academy }: AcademyViewProps) {
   const stats = academy.getOverallStats;
+  const todayRaw = new Date();
+  const todayDayOfWeek = todayRaw.getDay();
+  const todayStr = format(todayRaw, 'yyyy-MM-dd');
+
+  const scheduledToday = academy.subjects.filter(s => s.schedule?.includes(todayDayOfWeek));
+  const otherSubjects = academy.subjects.filter(s => !s.schedule?.includes(todayDayOfWeek));
+
+  const markAllToday = () => {
+    scheduledToday.forEach(subject => {
+      academy.markAttendance(subject.id, todayStr, 'present');
+    });
+  };
 
   return (
     <div className="py-8 max-w-6xl mx-auto w-full px-4 sm:px-0">
@@ -80,24 +92,50 @@ export function AcademyView({ themeColor, academy }: AcademyViewProps) {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {academy.subjects.map((subject) => (
-            <SubjectCard 
-              key={subject.id} 
-              subject={subject} 
-              academy={academy} 
-            />
-          ))}
-        </AnimatePresence>
-        
-        {academy.subjects.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-white/40 rounded-[2.5rem] border border-dashed border-outline/20">
-            <Book size={48} className="mx-auto mb-4 text-outline/20" />
-            <p className="serif-italic text-xl text-on-surface-variant">No subjects enrolled yet.</p>
+      {scheduledToday.length > 0 && (
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h4 className="flex items-center gap-2 text-sm uppercase tracking-widest font-bold text-on-surface-variant">
+              <CalendarIcon size={16} /> Scheduled Today
+            </h4>
+            <button
+              onClick={markAllToday}
+              className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-600 rounded-xl text-[10px] uppercase tracking-widest font-bold hover:bg-green-500/20 transition-colors"
+            >
+              <Check size={14} /> Mass Mark Present
+            </button>
           </div>
-        )}
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <AnimatePresence>
+              {scheduledToday.map((subject) => (
+                <SubjectCard key={subject.id} subject={subject} academy={academy} />
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {otherSubjects.length > 0 && (
+        <div>
+          <h4 className="flex items-center gap-2 text-sm uppercase tracking-widest font-bold text-on-surface-variant mb-6 opacity-50">
+            Other Subjects
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 opacity-80 hover:opacity-100 transition-opacity">
+            <AnimatePresence>
+              {otherSubjects.map((subject) => (
+                <SubjectCard key={subject.id} subject={subject} academy={academy} />
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {academy.subjects.length === 0 && (
+        <div className="py-20 text-center bg-white/40 rounded-[2.5rem] border border-dashed border-outline/20">
+          <Book size={48} className="mx-auto mb-4 text-outline/20" />
+          <p className="serif-italic text-xl text-on-surface-variant">No subjects enrolled yet.</p>
+        </div>
+      )}
 
     </div>
   );
@@ -136,16 +174,24 @@ function SubjectCard({ subject, academy }: SubjectCardProps) {
               {subject.code || 'NO CODE'}
             </span>
           </div>
-          <h4 className="serif-italic text-2xl text-on-surface leading-tight pr-8">{subject.name}</h4>
+          <h4 className="serif-italic text-2xl text-on-surface leading-tight pr-[80px]">{subject.name}</h4>
         </div>
         
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity absolute top-6 right-6">
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-6 right-6">
+          <button 
+            onClick={() => academy.setDeepDiveSubject(subject)}
+            className="p-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-lg transition-colors"
+            title="Analysis Deep Dive"
+          >
+            <Activity size={14} />
+          </button>
           <button 
             onClick={() => {
               academy.setEditingSubject(subject);
               academy.setIsSubjectModalOpen(true);
             }}
             className="p-1.5 bg-outline/5 hover:bg-outline/10 text-on-surface-variant rounded-lg transition-colors"
+            title="Edit Subject"
           >
             <Edit2 size={14} />
           </button>

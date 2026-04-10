@@ -38,5 +38,6 @@ export interface Subject {
   code: string;
   targetAttendance: number; // e.g. 75
   themeColor: string;
+  schedule?: number[]; // Array of weekdays 0-6 (0 = Sunday). When is the class held?
   records: Record<string, AttendanceRecord>; // mapping date string (YYYY-MM-DD) to record
 }

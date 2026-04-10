@@ -22,6 +22,7 @@ export function useAcademy() {
 
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
+  const [deepDiveSubject, setDeepDiveSubject] = useState<Subject | null>(null);
 
   useEffect(() => {
     localStorage.setItem('curator_academy_subjects', JSON.stringify(subjects));
@@ -136,6 +137,7 @@ export function useAcademy() {
     subjects,
     isSubjectModalOpen, setIsSubjectModalOpen,
     editingSubject, setEditingSubject,
+    deepDiveSubject, setDeepDiveSubject,
     addOrUpdateSubject,
     deleteSubject,
     markAttendance,
