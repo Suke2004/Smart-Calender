@@ -1,127 +1,66 @@
-# The Curator | Smart Calendar 🕊️
+# The Curator | Smart Calendar & Academic Ledger
 
-[![React](https://img.shields.io/badge/React-19.0.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-**The Curator** is a high-end, editorial-inspired calendar application designed for those who treat their schedule like a curated collection of moments. Beyond basic scheduling, it emphasizes reflection, editorial intelligence, and aesthetic excellence. It is fully **PWA-enabled**, meaning it can be installed on your desktop or mobile device and used entirely **offline**.
-
-<div align="center">
-  <img width="1200" height="auto" alt="Project Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
-## ✨ Key Features
-
-- **📱 Web App (PWA)**: Installable on iOS, Android, and Desktop. Works offline with "Offline-First" architecture.
-- **💾 Local Persistence**: All your notes and profile settings are saved locally in your browser—no backend required.
-- **🏛️ High-End Aesthetic**: A premium "editorial" interface featuring modern typography (Newsreader & Inter) and dynamic color-splash backdrops that shift with the months.
-- **📅 Multi-Perspective Navigation**:
-  - **Monthly View**: Detailed day-to-day curation with hero imagery.
-  - **Yearly Archive**: A bird's-eye view of your entire year's activity.
-  - **Pinned Collection**: A dedicated space for your most significant entries.
-- **✍️ Intelligent Entry System**: Categorize your life into *Editorial*, *Reflection*, or *Memo* entries with support for custom labels and multi-day ranges.
-- **🔄 Smart Recurrence**: Effortlessly schedule weekly or monthly recurring events.
-- **🔍 Full-Archive Search**: A lightning-fast, fullscreen search overlay to rediscover moments across years.
-- **📸 Export to PNG**: Generate beautiful, high-quality images of your monthly calendar for sharing or archival purposes.
-- **🔔 Proactive Reminders**: Built-in notification polling to keep track of upcoming events.
-
-## 🚀 Tech Stack
-
-- **Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Date Handling**: [date-fns](https://date-fns.org/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Exporting**: [modern-screenshot](https://github.com/weidongnian/modern-screenshot)
-
-## 🛠️ Getting Started
-
-### Prerequisites
-
-- Node.js (Latest stable version recommended)
-- pnpm / npm / yarn
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/smart-calendar.git
-   cd smart-calendar
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   pnpm install
-   # or
-   npm install
-   ```
-
-3. **Set up Environment Variables**:
-   Create a `.env.local` file (see `.env.example`) and add your required keys:
-   ```env
-   VITE_APP_NAME="The Curator"
-   ```
-
-4. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
-
-5. **Build for production**:
-   ```bash
-   pnpm build
-   ```
-
-## 🌐 Deployment
-
-This project is optimized for modern static hosting.
-
-### Deploy to Vercel
-1. Install [Vercel CLI](https://vercel.com/download): `pnpm i -g vercel`
-2. Run `vercel` in the root directory.
-3. The `vercel.json` will automatically handle Single Page App (SPA) routing.
-
-### Deploy to Netlify
-1. Drag and drop the `dist/` folder into [Netlify Drop](https://app.netlify.com/drop).
-2. Or use the Netlify CLI: `pnpm i -g netlify-cli && netlify deploy --prod`.
-
-## 🏗️ Project Structure
-
-The project follows a modular, clean-code architecture to ensure maintainability:
-
-```text
-src/
-├── components/
-│   └── Calendar/
-│       ├── layout/    # Header, Sidebar, Nav components
-│       ├── calendar/  # Grid, Cell, Hero primitives
-│       ├── views/     # Monthly, Yearly, Pinned view logic
-│       ├── notes/     # Note cards and lists
-│       └── modals/    # Search, Profile, and Entry modals
-├── hooks/
-│   └── useCalendar.ts # Centralized business logic & state
-├── constants.ts       # Themes, holiday data, and initial state
-└── utils.ts           # Calendar arithmetic and styling helpers
-```
-
-## 🤝 Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+**The Curator** is a professional, high-end editorial calendar and intelligent attendance tracking suite designed specifically for power-users and university students (B.Tech). Built with a cinematic visual identity, it blends productivity with mindful reflection and predictive analytics.
 
 ---
 
-<p align="center">
-  Built with ❤️ from SuperPlugs
-</p>
+## 🌟 Key Features
+
+### 🏛️ The Curator (Calendar Module)
+- **Editorial Experience**: A beautifully responsive monthly/yearly grid inspired by premium print magazines.
+- **Smart Notes**: Categorize thoughts as *Editorial* (Standard), *Reflection* (Deep), or *Memo* (Fast).
+- **Recurrence Logic**: Support for weekly and monthly recurring reminders.
+- **Search & Filter**: Global search overlay to find any past memory or scheduled event instantly.
+
+### 🎓 The Academy (Academic Ledger)
+- **Intelligent Attendance**: Not just a logger—it's an "Oracle" dashboard that predicts your path.
+- **Predictive Math**: Human-readable insights like *"You can safely skip 3 classes"* or *"Must attend next 5 classes to recover."*
+- **The Timetable Engine**: Context-aware scheduling. See only what's scheduled for *today* to minimize clutter.
+- **Deep Dive Analytics**: Interactive area charts (Recharts) visualizing your attendance trajectory over 30 days.
+- **The Time Machine**: An interactive mini-calendar for rapid historical back-logging and status toggling.
+
+### 🧩 Global Features
+- **Cinematic Onboarding**: Multi-step setup with integrated camera support for personal profile photos.
+- **Dual-Module Dock**: A floating OSX-style dock for seamless navigation between the Calendar and the Ledger.
+- **Offline-First (PWA)**: Fully installable Progressive Web App. All your data lives in local storage—zero cloud latency, zero privacy concerns.
+
+---
+
+## 🛠️ Technology Stack
+- **Frontend**: React 19 + TypeScript
+- **State Management**: Custom Hooks (`useCalendar`, `useAcademy`) with Local Storage persistence.
+- **Animations**: Framer Motion (Motion 12)
+- **Data Viz**: Recharts
+- **Icons**: Lucide React
+- **Date Handling**: Date-fns
+- **Styling**: Tailwind CSS 4
+
+---
+
+## 🚀 Getting Started
+
+### Local Development
+```bash
+# Install dependencies
+pnpm install
+
+# Run dev server
+pnpm run dev
+```
+
+### Installation (PWA)
+1. Open the hosted URL in Chrome/Safari/Brave.
+2. Click the **"Install"** or **"Add to Home Screen"** icon in the address bar.
+3. Access "The Curator" as a native app on your desktop or mobile device.
+
+### Hosting
+The project is pre-configured for **Vercel** with a `vercel.json` SPA rewriter. Simply connect your GitHub repository to Vercel and it will deploy automatically.
+
+---
+
+## 🧘‍♀️ Mindful Design
+Every pixel of The Curator is designed to feel calm and organized. From the glassmorphic modals to the subtle color-splash backgrounds that shift based on the month, it is an interface that respects your focus.
+
+---
+
+*Curate your life. Master your schedule.*
