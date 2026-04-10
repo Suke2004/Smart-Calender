@@ -23,3 +23,20 @@ export interface DateRange {
   start: Date | null;
   end: Date | null;
 }
+
+export type AttendanceStatus = 'present' | 'absent' | 'cancelled';
+
+export interface AttendanceRecord {
+  id: string; // Typically YYYY-MM-DD
+  date: string; // ISO String
+  status: AttendanceStatus;
+}
+
+export interface Subject {
+  id: string;
+  name: string;
+  code: string;
+  targetAttendance: number; // e.g. 75
+  themeColor: string;
+  records: Record<string, AttendanceRecord>; // mapping date string (YYYY-MM-DD) to record
+}
