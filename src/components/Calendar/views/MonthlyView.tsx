@@ -1,5 +1,5 @@
 import React from 'react';
-import { DateRange, Note, CalendarMonth } from '../../../types';
+import { DateRange, Note, CalendarMonth, Subject } from '../../../types';
 import { HeroSection } from '../calendar/HeroSection';
 import { CalendarGrid } from '../calendar/CalendarGrid';
 import { NotesList } from '../notes/NotesList';
@@ -19,6 +19,7 @@ interface MonthlyViewProps {
   filterType: FilterType;
   setFilterType: (type: FilterType) => void;
   currentMonthNotes: Note[];
+  subjects: Subject[];
   onDayClick: (day: Date) => void;
   onAddNote: () => void;
   onReorder: (notes: Note[]) => void;
@@ -40,6 +41,7 @@ export function MonthlyView({
   filterType,
   setFilterType,
   currentMonthNotes,
+  subjects,
   onDayClick,
   onAddNote,
   onReorder,
@@ -63,6 +65,7 @@ export function MonthlyView({
         themeColor={themeColor}
         monthName={monthInfo.name}
         monthYear={monthInfo.year}
+        subjects={subjects}
         onDayClick={onDayClick}
       />
       <NotesList

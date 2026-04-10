@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { DateRange, Note } from '../../../types';
+import { DateRange, Note, Subject } from '../../../types';
 import { pageVariants } from '../../../hooks/useCalendar';
 import { CalendarCell } from './CalendarCell';
 
@@ -16,12 +16,13 @@ interface CalendarGridProps {
   themeColor: string;
   monthName: string;
   monthYear: number;
+  subjects: Subject[];
   onDayClick: (day: Date) => void;
 }
 
 export function CalendarGrid({
   days, monthKey, direction, currentDate, range,
-  notes, themeColor, monthName, monthYear, onDayClick,
+  notes, themeColor, monthName, monthYear, subjects, onDayClick,
 }: CalendarGridProps) {
   return (
     <section className="bg-[#f3f4f1] p-2 sm:p-4 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-xl shadow-black/5 relative">
@@ -63,6 +64,7 @@ export function CalendarGrid({
               range={range}
               notes={notes}
               themeColor={themeColor}
+              subjects={subjects}
               onClick={onDayClick}
             />
           ))}

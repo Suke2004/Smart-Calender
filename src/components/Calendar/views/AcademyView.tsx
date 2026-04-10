@@ -205,13 +205,30 @@ function SubjectCard({ subject, academy }: SubjectCardProps) {
       </div>
 
       {/* Main Stats */}
-      <div className="flex items-end gap-3 mb-6">
-        <span className="serif-italic text-5xl tracking-tighter" style={{ color: subject.themeColor }}>
-          {stats.percentage.toFixed(0)}%
-        </span>
-        <span className="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5 opacity-50">
-          Target: {subject.targetAttendance}%
-        </span>
+      <div className="flex items-end justify-between mb-4">
+        <div className="flex items-end gap-3">
+          <span className="serif-italic text-5xl tracking-tighter" style={{ color: subject.themeColor }}>
+            {stats.percentage.toFixed(0)}%
+          </span>
+          <span className="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5 opacity-50">
+            Target: {subject.targetAttendance}%
+          </span>
+        </div>
+      </div>
+
+      <div className="flex gap-4 mb-5 px-1">
+        <div className="text-center">
+          <span className="block text-[14px] font-bold text-on-surface">{stats.present}</span>
+          <span className="text-[8px] uppercase tracking-widest font-bold text-on-surface-variant opacity-60">Present</span>
+        </div>
+        <div className="text-center">
+          <span className="block text-[14px] font-bold text-on-surface">{stats.absent}</span>
+          <span className="text-[8px] uppercase tracking-widest font-bold text-on-surface-variant opacity-60">Absent</span>
+        </div>
+        <div className="text-center">
+          <span className="block text-[14px] font-bold text-on-surface">{stats.total}</span>
+          <span className="text-[8px] uppercase tracking-widest font-bold text-on-surface-variant opacity-60">Total</span>
+        </div>
       </div>
 
       {/* Predictive Insights */}

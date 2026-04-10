@@ -6,7 +6,7 @@ import {
 } from 'date-fns';
 import { HOLIDAYS } from '../../../constants';
 import { isDateInRange, cn } from '../../../utils';
-import { DateRange, Note } from '../../../types';
+import { DateRange, Note, Subject } from '../../../types';
 
 interface CalendarCellProps {
   key?: React.Key;
@@ -15,10 +15,12 @@ interface CalendarCellProps {
   range: DateRange;
   notes: Note[];
   themeColor: string;
+  subjects: Subject[];
   onClick: (day: Date) => void;
 }
 
-export function CalendarCell({ day, currentDate, range, notes, themeColor, onClick }: CalendarCellProps) {
+export function CalendarCell({ day, currentDate, range, notes, themeColor, subjects, onClick }: CalendarCellProps) {
+
   const isCurrentMonth  = isSameMonth(day, currentDate);
   const isToday         = isSameDay(day, startOfToday());
   const isSelectedStart = !!(range.start && isSameDay(day, range.start));
@@ -35,6 +37,14 @@ export function CalendarCell({ day, currentDate, range, notes, themeColor, onCli
     if (n.endDate) return isWithinInterval(day, { start, end: parseISO(n.endDate) });
     return isSameDay(start, day);
   });
+
+  const dateStr = format(day, 'yyyy-MM-dd');
+  const dayAttendanceLogs = subjects
+    .filter(s => s.records[dateStr])
+    .map(s => ({
+      subject: s,
+      status: s.records[dateStr].status
+    }));
 
   return (
     <motion.div
@@ -120,6 +130,23 @@ export function CalendarCell({ day, currentDate, range, notes, themeColor, onCli
                 style={note.endDate ? { backgroundColor: themeColor } : {}}
               />
             ))}
+          </div>
+        )}
+
+        {/* --- ACADEMIC LEDGER BRIDGING VISUALS --- */}
+        {dayAttendanceLogs.length > 0 && (
+          <div className="flex gap-0.5 mt-0.5" title="Academy Logs">
+            {dayAttendanceLogs.map((log, idx) => {
+              let dotColor = "bg-gray-400"; // Cancelled
+              if (log.status === 'present') dotColor = "bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]";
+              if (log.status === 'absent') dotColor = "bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)]";
+              return (
+                <div
+                  key={`academy-log-${idx}`}
+                  className={cn('w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full z-10', dotColor)}
+                />
+              );
+            })}
           </div>
         )}
 

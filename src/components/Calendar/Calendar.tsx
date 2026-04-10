@@ -13,9 +13,11 @@ import { ProfileModal } from './modals/ProfileModal';
 import { SearchOverlay } from './modals/SearchOverlay';
 import { NotificationsPanel } from './modals/NotificationsPanel';
 import { OnboardingModal } from './modals/OnboardingModal';
+import { useAcademy } from '../../hooks/useAcademy';
 
 export default function Calendar() {
   const cal = useCalendar();
+  const academy = useAcademy(); // Visual Bridge ONLY - used for calendar rendering
 
   return (
     <div
@@ -83,6 +85,7 @@ export default function Calendar() {
               filterType={cal.filterType}
               setFilterType={cal.setFilterType}
               currentMonthNotes={cal.currentMonthNotes}
+              subjects={academy.subjects} // Injecting academy subjects for visual bridging!
               onDayClick={cal.handleDateClick}
               onAddNote={() => cal.setIsNoteModalOpen(true)}
               onReorder={cal.handleReorder}
