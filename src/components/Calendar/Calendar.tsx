@@ -40,6 +40,7 @@ import { domToPng } from 'modern-screenshot';
 import { MONTHS_DATA, INITIAL_NOTES, HOLIDAYS } from '../../constants';
 import { getCalendarDays, isDateInRange, cn } from '../../utils';
 import { DateRange, Note } from '../../types';
+import { DateRangePicker } from './DateRangePicker';
 
 interface NotificationItemProps {
   icon: React.ReactNode;
@@ -69,7 +70,6 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date(2024, 0, 1));
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [notes, setNotes] = useState<Note[]>(INITIAL_NOTES);
-  const [hoverDate, setHoverDate] = useState<Date | null>(null);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [newNoteContent, setNewNoteContent] = useState('');
   const [selectedDateForNote, setSelectedDateForNote] = useState<Date | null>(null);
@@ -88,6 +88,7 @@ export default function Calendar() {
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop'
   });
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
@@ -143,12 +144,8 @@ export default function Calendar() {
   const days = useMemo(() => getCalendarDays(currentDate), [currentDate]);
 
   const handleDateClick = (date: Date) => {
-    if (!range.start || (range.start && range.end)) {
-      setRange({ start: date, end: null });
-      setSelectedDateForNote(date);
-    } else {
-      setRange({ ...range, end: date });
-    }
+    setRange({ start: date, end: null });
+    setSelectedDateForNote(date);
   };
 
   const nextMonth = () => {
@@ -187,6 +184,7 @@ export default function Calendar() {
     setNewNoteContent('');
     setNewNoteLabel('');
     setIsNoteModalOpen(false);
+    setIsDatePickerOpen(false);
     setEditingNote(null);
     setRecurrence('none');
     setNoteType('editorial');
@@ -527,8 +525,7 @@ export default function Calendar() {
                       const isToday = isSameDay(day, startOfToday());
                       const isSelectedStart = range.start && isSameDay(day, range.start);
                       const isSelectedEnd = range.end && isSameDay(day, range.end);
-                      const isHoverInRange = range.start && !range.end && hoverDate && isDateInRange(day, range.start, hoverDate);
-                      const isInRange = isDateInRange(day, range.start, range.end) || isHoverInRange;
+                      const isInRange = isDateInRange(day, range.start, range.end);
                       const holiday = HOLIDAYS[format(day, 'yyyy-MM-dd')];
                       const dayNotes = notes.filter(n => {
                         const start = parseISO(n.date);
@@ -546,8 +543,6 @@ export default function Calendar() {
                         <motion.div 
                           key={day.toString()}
                           onClick={() => handleDateClick(day)}
-                          onMouseEnter={() => setHoverDate(day)}
-                          onMouseLeave={() => setHoverDate(null)}
                           whileHover={{ scale: 1.02, y: -2 }}
                           className={cn(
                             "aspect-square p-0.5 sm:p-2 lg:p-4 flex flex-col justify-between group cursor-pointer transition-all relative overflow-hidden rounded-lg sm:rounded-3xl border border-transparent",
@@ -559,16 +554,6 @@ export default function Calendar() {
                           aria-label={format(day, 'MMMM d, yyyy')}
                           aria-selected={isSelectedStart || isSelectedEnd || isInRange}
                         >
-                          {range.start && !range.end && hoverDate && isAfter(hoverDate, range.start) && isSameDay(day, hoverDate) && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[8px] uppercase tracking-widest px-2 py-1 rounded shadow-lg whitespace-nowrap z-50 pointer-events-none"
-                            >
-                              Select End Date
-                            </motion.div>
-                          )}
-
                           <div className="flex justify-between items-start z-10">
                             <div className="relative group/holiday">
                               <span className={cn(
@@ -638,7 +623,7 @@ export default function Calendar() {
 
                           {isInRange && (
                             <motion.div layoutId="range-highlight" className={cn("absolute inset-0 pointer-events-none flex items-center", isSelectedStart && !isSelectedEnd ? "left-1/2" : "", isSelectedEnd && !isSelectedStart ? "right-1/2" : "", isSelectedStart && isSelectedEnd ? "hidden" : "")}>
-                              <div style={{ backgroundColor: `${themeColor}15`, borderTopColor: `${themeColor}30`, borderBottomColor: `${themeColor}30` }} className={cn("h-6 sm:h-10 lg:h-12 w-full border-y transition-colors duration-300", isHoverInRange && "border-dashed")} />
+                              <div style={{ backgroundColor: `${themeColor}15`, borderTopColor: `${themeColor}30`, borderBottomColor: `${themeColor}30` }} className="h-6 sm:h-10 lg:h-12 w-full border-y transition-colors duration-300" />
                             </motion.div>
                           )}
                         </motion.div>
@@ -862,7 +847,7 @@ export default function Calendar() {
       <AnimatePresence>
         {isNoteModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsNoteModalOpen(false); setEditingNote(null); setNewNoteContent(''); }} className="absolute inset-0 bg-on-surface/10 backdrop-blur-xl" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsNoteModalOpen(false); setEditingNote(null); setNewNoteContent(''); setIsDatePickerOpen(false); }} className="absolute inset-0 bg-on-surface/10 backdrop-blur-xl" />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
@@ -873,7 +858,7 @@ export default function Calendar() {
               aria-labelledby="note-modal-title"
             >
               <button 
-                onClick={() => { setIsNoteModalOpen(false); setEditingNote(null); setNewNoteContent(''); }} 
+                onClick={() => { setIsNoteModalOpen(false); setEditingNote(null); setNewNoteContent(''); setIsDatePickerOpen(false); }} 
                 className="absolute top-8 right-8 text-on-surface-variant hover:text-on-surface p-2 hover:bg-outline/5 rounded-full transition-all"
                 aria-label="Close Modal"
               >
@@ -890,17 +875,39 @@ export default function Calendar() {
                     <button onClick={() => setNoteType('memo')} style={noteType === 'memo' ? { backgroundColor: themeColor } : {}} className={cn("text-[8px] uppercase tracking-widest font-bold px-2 py-1 rounded transition-colors", noteType === 'memo' ? "text-surface" : "bg-outline/5 text-on-surface-variant")} aria-pressed={noteType === 'memo'}>Memo</button>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between relative">
                     <div className="flex items-center gap-2">
                       <CalendarDays size={14} style={{ color: themeColor }} />
-                      <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
+                      <button 
+                        onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                        className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold hover:text-on-surface transition-colors"
+                        aria-label="Select Date Range"
+                      >
                         {editingNote ? (
                           <>{format(parseISO(editingNote.date), 'MMMM dd')}{editingNote.endDate && ` — ${format(parseISO(editingNote.endDate), 'MMMM dd, yyyy')}`}{!editingNote.endDate && `, ${format(parseISO(editingNote.date), 'yyyy')}`}</>
                         ) : (
                           <>{range.start ? format(range.start, 'MMMM dd') : format(startOfToday(), 'MMMM dd')}{range.end && ` — ${format(range.end, 'MMMM dd, yyyy')}`}{!range.end && `, ${format(range.start || startOfToday(), 'yyyy')}`}</>
                         )}
-                      </p>
+                      </button>
                     </div>
+                    {isDatePickerOpen && (
+                      <div className="absolute top-full left-0 mt-2 z-50">
+                        <DateRangePicker 
+                          range={range} 
+                          onChange={(newRange) => {
+                            setRange(newRange);
+                            if (editingNote) {
+                              setEditingNote({
+                                ...editingNote,
+                                date: newRange.start ? newRange.start.toISOString() : editingNote.date,
+                                endDate: newRange.end ? newRange.end.toISOString() : undefined
+                              });
+                            }
+                          }} 
+                          themeColor={themeColor} 
+                        />
+                      </div>
+                    )}
                     <div className="flex items-center gap-2" role="group" aria-label="Recurrence Options">
                       <button onClick={() => setRecurrence(recurrence === 'weekly' ? 'none' : 'weekly')} style={recurrence === 'weekly' ? { backgroundColor: themeColor } : {}} className={cn("flex items-center gap-1 text-[8px] uppercase tracking-widest font-bold px-2 py-1 rounded transition-colors", recurrence === 'weekly' ? "text-surface" : "bg-outline/5 text-on-surface-variant")} aria-pressed={recurrence === 'weekly'}><Repeat size={10} /> Weekly</button>
                       <button onClick={() => setRecurrence(recurrence === 'monthly' ? 'none' : 'monthly')} style={recurrence === 'monthly' ? { backgroundColor: themeColor } : {}} className={cn("flex items-center gap-1 text-[8px] uppercase tracking-widest font-bold px-2 py-1 rounded transition-colors", recurrence === 'monthly' ? "text-surface" : "bg-outline/5 text-on-surface-variant")} aria-pressed={recurrence === 'monthly'}><Repeat size={10} /> Monthly</button>
