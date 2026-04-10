@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar as CalendarIcon, Archive, Pin as PinIcon, BookOpen } from 'lucide-react';
+import { Calendar as CalendarIcon, Archive, Pin as PinIcon } from 'lucide-react';
 import { cn } from '../../../utils';
 import { ViewMode } from '../../../hooks/useCalendar';
 
@@ -73,12 +73,6 @@ export function Sidebar({ viewMode, themeColor, onViewChange, onAddEntry }: Side
           label="Pinned Notes"
           active={viewMode === 'pinned'}
           onClick={() => onViewChange('pinned')}
-        />
-        <SidebarItem
-          icon={<BookOpen size={18} />}
-          label="Academic Ledger"
-          active={viewMode === 'academy'}
-          onClick={() => onViewChange('academy')}
         />
       </nav>
 

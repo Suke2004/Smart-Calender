@@ -25,7 +25,7 @@ export interface UserProfile {
   photo: string;
 }
 
-export type ViewMode      = 'monthly' | 'yearly' | 'pinned' | 'academy';
+export type ViewMode      = 'monthly' | 'yearly' | 'pinned';
 export type NoteType      = 'editorial' | 'reflection' | 'memo';
 export type FilterType    = 'all' | 'editorial' | 'reflection' | 'memo';
 export type RecurrenceType = 'none' | 'weekly' | 'monthly';

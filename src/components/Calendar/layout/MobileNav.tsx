@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar as CalendarIcon, Archive, Pin as PinIcon, BookOpen } from 'lucide-react';
+import { Calendar as CalendarIcon, Archive, Pin as PinIcon } from 'lucide-react';
 import { cn } from '../../../utils';
 import { ViewMode, UserProfile } from '../../../hooks/useCalendar';
 
@@ -67,13 +67,6 @@ export function MobileNav({ viewMode, themeColor, userProfile, onViewChange, onO
         active={viewMode === 'pinned'}
         themeColor={themeColor}
         onClick={() => onViewChange('pinned')}
-      />
-      <MobileNavItem
-        icon={<BookOpen size={20} />}
-        label="Academy"
-        active={viewMode === 'academy'}
-        themeColor={themeColor}
-        onClick={() => onViewChange('academy')}
       />
       <div
         onClick={onOpenProfile}

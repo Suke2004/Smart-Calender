@@ -7,19 +7,15 @@ import { MobileNav } from './layout/MobileNav';
 import { MonthlyView } from './views/MonthlyView';
 import { YearlyView } from './views/YearlyView';
 import { PinnedNotesView } from './views/PinnedNotesView';
-import { AcademyView } from './views/AcademyView';
 import { NoteModal } from './modals/NoteModal';
-import { SubjectModal } from './modals/SubjectModal';
 import { DeleteModal } from './modals/DeleteModal';
 import { ProfileModal } from './modals/ProfileModal';
 import { SearchOverlay } from './modals/SearchOverlay';
 import { NotificationsPanel } from './modals/NotificationsPanel';
 import { OnboardingModal } from './modals/OnboardingModal';
-import { useAcademy } from '../../hooks/useAcademy';
 
 export default function Calendar() {
   const cal = useCalendar();
-  const academy = useAcademy();
 
   return (
     <div
@@ -103,8 +99,6 @@ export default function Calendar() {
                 cal.setViewMode('monthly');
               }}
             />
-          ) : cal.viewMode === 'academy' ? (
-            <AcademyView themeColor={cal.themeColor} academy={academy} />
           ) : (
             <PinnedNotesView
               notes={cal.notes}
@@ -152,14 +146,6 @@ export default function Calendar() {
         note={cal.noteToDelete}
         onConfirm={cal.confirmDelete}
         onCancel={() => cal.setNoteToDelete(null)}
-      />
-
-      <SubjectModal
-        isOpen={academy.isSubjectModalOpen}
-        onClose={() => academy.setIsSubjectModalOpen(false)}
-        editingSubject={academy.editingSubject}
-        onSave={academy.addOrUpdateSubject}
-        themeColor={cal.themeColor}
       />
 
       <ProfileModal
