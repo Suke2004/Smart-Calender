@@ -64,3 +64,6 @@ Every pixel of The Curator is designed to feel calm and organized. From the glas
 ---
 
 *Curate your life. Master your schedule.*
+<div align="center">
+  Built with love from SuperPlugs
+</div>
