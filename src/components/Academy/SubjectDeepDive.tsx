@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, Minus, Calendar as CalendarIcon, TrendingUp, AlertCircle } from 'lucide-react';
+import { X, Calendar as CalendarIcon, AlertCircle } from 'lucide-react';
 import { Subject } from '../../types';
 import { useAcademy } from '../../hooks/useAcademy';
-import { format, subDays, isSameDay } from 'date-fns';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Area, AreaChart } from 'recharts';
+import { format, subDays, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isAfter } from 'date-fns';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { cn } from '../../utils';
 
 interface SubjectDeepDiveProps {
@@ -12,6 +12,8 @@ interface SubjectDeepDiveProps {
   onClose: () => void;
   academy: ReturnType<typeof useAcademy>;
 }
+
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDiveProps) {
   
@@ -22,7 +24,6 @@ export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDivePr
     let cumulativePresent = 0;
     let cumulativeTotal = 0;
 
-    // We'll generate data for the last 30 days
     for (let i = 29; i >= 0; i--) {
       const d = subDays(new Date(), i);
       const dateStr = format(d, 'yyyy-MM-dd');
@@ -49,17 +50,26 @@ export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDivePr
     return data;
   }, [subject]);
 
-  const recentDays = useMemo(() => {
-    const days = [];
-    for (let i = 0; i < 7; i++) {
-       days.push(subDays(new Date(), i));
-    }
-    return days;
+  const { blankDays, monthDays } = useMemo(() => {
+    const start = startOfMonth(new Date());
+    const end = endOfMonth(start);
+    const days = eachDayOfInterval({ start, end });
+    const firstDay = getDay(start);
+    const blanks = firstDay === 0 ? 6 : firstDay - 1; // 0 for Monday
+    return { blankDays: Array(blanks).fill(null), monthDays: days };
   }, []);
 
   if (!subject) return null;
 
   const stats = academy.calculateStats(subject.records, subject.targetAttendance);
+
+  const cycleAttendance = (dateStr: string) => {
+    const currentStatus = subject.records[dateStr]?.status;
+    if (!currentStatus) academy.markAttendance(subject.id, dateStr, 'present');
+    else if (currentStatus === 'present') academy.markAttendance(subject.id, dateStr, 'absent');
+    else if (currentStatus === 'absent') academy.markAttendance(subject.id, dateStr, 'cancelled');
+    else academy.markAttendance(subject.id, dateStr, 'cancelled'); // Hitting cancel twice toggles it off in the hook!
+  };
 
   return (
     <AnimatePresence>
@@ -76,31 +86,31 @@ export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDivePr
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-5xl bg-surface/95 backdrop-blur-3xl min-h-[80vh] max-h-[95vh] overflow-y-auto p-10 rounded-[2.5rem] shadow-2xl border border-white/20"
+          className="relative w-full max-w-5xl bg-surface/95 backdrop-blur-3xl min-h-[80vh] max-h-[95vh] overflow-y-auto p-6 sm:p-10 rounded-[2.5rem] shadow-2xl border border-white/20"
         >
           <button
             onClick={onClose}
-            className="absolute top-8 right-8 text-on-surface-variant hover:text-on-surface p-2 hover:bg-outline/5 rounded-full transition-all"
+            className="absolute top-6 sm:top-8 right-6 sm:right-8 text-on-surface-variant hover:text-on-surface p-2 hover:bg-outline/5 rounded-full transition-all z-10"
           >
             <X size={24} />
           </button>
 
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-12 pr-12">
             <div className="flex gap-2 items-center mb-2">
               <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: subject.themeColor }} />
               <span className="text-xs uppercase tracking-widest text-on-surface-variant font-bold">
                 {subject.code || 'Deep Dive'}
               </span>
             </div>
-            <h2 className="serif-italic text-5xl tracking-tighter text-on-surface">{subject.name}</h2>
+            <h2 className="serif-italic text-4xl sm:text-5xl tracking-tighter text-on-surface">{subject.name}</h2>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             
-            {/* Left Column: Analytics */}
-            <div className="lg:col-span-2 space-y-8">
-              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-black/[0.02]">
+            {/* Analytics Column */}
+            <div className="xl:col-span-2 space-y-8">
+              <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-sm border border-black/[0.02]">
                 <div className="flex justify-between items-end mb-8">
                   <div>
                      <h3 className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
@@ -165,67 +175,65 @@ export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDivePr
               </div>
             </div>
 
-            {/* Right Column: Historical Backlog */}
+            {/* Interactive Calendar Column */}
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-black/[0.02]">
-                <div className="flex items-center gap-2 mb-6">
-                  <CalendarIcon size={16} className="text-on-surface-variant" />
-                  <h3 className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
-                    Historical Log (7 Days)
-                  </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon size={16} className="text-on-surface-variant" />
+                    <h3 className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
+                      {format(new Date(), 'MMMM yyyy')}
+                    </h3>
+                  </div>
+                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">Tap days to toggle</span>
                 </div>
 
-                <div className="space-y-2">
-                  {recentDays.map((d) => {
+                {/* Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {DAY_LABELS.map(day => (
+                    <div key={`header-${day}`} className="text-center py-2 text-[8px] uppercase font-bold text-on-surface-variant opacity-50">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {blankDays.map((_, i) => <div key={`blank-${i}`} />)}
+
+                  {monthDays.map((d) => {
                     const dateStr = format(d, 'yyyy-MM-dd');
                     const record = subject.records[dateStr];
-
-                    let highlightClass = "bg-outline/5";
-                    if (record?.status === 'present') highlightClass = "bg-green-500/10 border-green-500/20";
-                    if (record?.status === 'absent') highlightClass = "bg-red-500/10 border-red-500/20";
+                    const isFuture = isAfter(d, new Date()) && !isSameDay(d, new Date());
+                    
+                    let bgClass = "bg-outline/5 hover:bg-outline/10 text-on-surface";
+                    if (record?.status === 'present') bgClass = "bg-green-500 shadow-md text-white font-bold";
+                    if (record?.status === 'absent') bgClass = "bg-red-500 shadow-md text-white font-bold";
+                    if (record?.status === 'cancelled') bgClass = "bg-gray-400 shadow-sm text-white font-bold";
 
                     return (
-                      <div key={dateStr} className={cn("flex items-center justify-between p-3 rounded-xl border border-transparent transition-colors", highlightClass)}>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-on-surface">
-                            {isSameDay(d, new Date()) ? 'Today' : format(d, 'EEEE')}
-                          </span>
-                          <span className="text-[10px] text-on-surface-variant">{format(d, 'MMM dd')}</span>
-                        </div>
-                        
-                        <div className="flex gap-1">
-                          <button 
-                            onClick={() => academy.markAttendance(subject.id, dateStr, 'present')}
-                            className={cn(
-                              "p-2 rounded-lg transition-all",
-                              record?.status === 'present' ? "bg-green-500 text-white shadow-md" : "text-on-surface-variant hover:bg-black/5"
-                            )}
-                          >
-                            <Check size={14} />
-                          </button>
-                          <button 
-                            onClick={() => academy.markAttendance(subject.id, dateStr, 'absent')}
-                            className={cn(
-                              "p-2 rounded-lg transition-all",
-                              record?.status === 'absent' ? "bg-red-500 text-white shadow-md" : "text-on-surface-variant hover:bg-black/5"
-                            )}
-                          >
-                            <X size={14} />
-                          </button>
-                          <button 
-                            onClick={() => academy.markAttendance(subject.id, dateStr, 'cancelled')}
-                            className={cn(
-                              "p-2 rounded-lg transition-all",
-                              record?.status === 'cancelled' ? "bg-gray-400 text-white shadow-md" : "text-on-surface-variant hover:bg-black/5"
-                            )}
-                          >
-                            <Minus size={14} />
-                          </button>
-                        </div>
-                      </div>
+                      <button
+                        key={dateStr}
+                        disabled={isFuture}
+                        onClick={() => cycleAttendance(dateStr)}
+                        className={cn(
+                          "aspect-square rounded-xl flex items-center justify-center text-xs transition-all",
+                          bgClass,
+                          isFuture && "opacity-30 cursor-not-allowed",
+                          isSameDay(d, new Date()) && !record && "border-2 border-black/20"
+                        )}
+                        title={record ? `Currently: ${record.status}` : isFuture ? "Future date" : "Unmarked"}
+                      >
+                        {format(d, 'd')}
+                      </button>
                     );
                   })}
                 </div>
+
+                {/* Legend */}
+                <div className="flex justify-between items-center mt-6 px-1">
+                  <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500"/><span className="text-[8px] uppercase tracking-widest font-bold opacity-60">Present</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500"/><span className="text-[8px] uppercase tracking-widest font-bold opacity-60">Absent</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-gray-400"/><span className="text-[8px] uppercase tracking-widest font-bold opacity-60">Cancel</span></div>
+                </div>
+
               </div>
             </div>
 
@@ -235,3 +243,4 @@ export function SubjectDeepDive({ subject, onClose, academy }: SubjectDeepDivePr
     </AnimatePresence>
   );
 }
+

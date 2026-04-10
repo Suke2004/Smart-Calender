@@ -133,11 +133,17 @@ export function useAcademy() {
     return "The Phantom";
   }, [getOverallStats]);
 
+  const derivedDeepDiveSubject = useMemo(() => {
+    if (!deepDiveSubject) return null;
+    return subjects.find(s => s.id === deepDiveSubject.id) || null;
+  }, [subjects, deepDiveSubject]);
+
   return {
     subjects,
     isSubjectModalOpen, setIsSubjectModalOpen,
     editingSubject, setEditingSubject,
-    deepDiveSubject, setDeepDiveSubject,
+    deepDiveSubject: derivedDeepDiveSubject,
+    setDeepDiveSubject,
     addOrUpdateSubject,
     deleteSubject,
     markAttendance,
