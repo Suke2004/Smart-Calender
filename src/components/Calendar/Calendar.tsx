@@ -104,7 +104,7 @@ export default function Calendar() {
               }}
             />
           ) : cal.viewMode === 'academy' ? (
-            <AcademyView themeColor={cal.themeColor} />
+            <AcademyView themeColor={cal.themeColor} academy={academy} />
           ) : (
             <PinnedNotesView
               notes={cal.notes}

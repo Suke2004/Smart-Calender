@@ -8,10 +8,10 @@ import { cn } from '../../../utils';
 
 interface AcademyViewProps {
   themeColor: string;
+  academy: ReturnType<typeof useAcademy>;
 }
 
-export function AcademyView({ themeColor }: AcademyViewProps) {
-  const academy = useAcademy();
+export function AcademyView({ themeColor, academy }: AcademyViewProps) {
   const stats = academy.getOverallStats;
 
   return (
